@@ -1,0 +1,14 @@
+[package]
+name = "genetic-alg"
+version = "0.1.0"
+authors = ["Clinton McKay <mr.mckizzle@gmail.com>"]
+
+[lib]
+name = "genalg"
+path = "src/lib.rs"
+
+[[bin]]    
+name = "genalg"    
+path = "src/main.rs"
+
+
