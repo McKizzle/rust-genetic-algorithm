@@ -1,14 +1,16 @@
 [package]
 name = "genetic-alg"
 version = "0.1.0"
-authors = ["Clinton McKay <mr.mckizzle@gmail.com>"]
+authors = ["Clinton McKay <mckizzle@users.noreply.github.com>"]
 
 [lib]
 name = "genalg"
-path = "src/lib.rs"
+path = "src/genalg/lib.rs"
 
 [[bin]]    
-name = "genalg"    
+name = "genalg_runner"    
 path = "src/main.rs"
 
+[dependencies]
+rand = "0.3.14"
 
