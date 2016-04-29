@@ -11,6 +11,19 @@ mod speciman {
         pub dna: Vec<bool>,
     }
 
+    impl Clone for Speciman {
+        fn clone(&self) -> Speciman {
+            Speciman { 
+                id: self.id, 
+                dna: self.dna.iter().cloned().collect(),
+            }
+        }
+
+        fn clone_from(&mut self, source: &Speciman) {
+            unimplemented!(); 
+        } 
+    }
+
     impl fmt::Display for Speciman {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             let _ = write!(f, "Speciman {}: [", self.id);
@@ -30,10 +43,33 @@ mod speciman {
         }
 
         /**
+         * Generates a new Speciman using two existing speciman. Single point crossover is used. 
+         */
+        pub fn procreate(mate1: Speciman, mate2: Speciman) -> Speciman {
+            Speciman { 
+                id: 1, 
+                dna: mate1.dna.iter()
+                              .take(mate1.dna.len() / 2)
+                              .chain(mate2.dna.iter()
+                                              .rev()
+                                              .take(mate2.dna.len() / 2))
+                              .cloned()
+                              .collect::<Vec<bool>>(),
+            }
+        }
+
+        /**
          * The fitness of the speciman.
          */
         pub fn fitness() -> i32 {
             0
+        }
+       
+        /**
+         * TODO: Mutation function for a speciman. 
+         */
+        pub fn mutate() {
+            
         }
     }
 }

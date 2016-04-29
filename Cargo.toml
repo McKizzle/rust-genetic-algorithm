@@ -3,6 +3,9 @@ name = "genetic-alg"
 version = "0.1.0"
 authors = ["Clinton McKay <mckizzle@users.noreply.github.com>"]
 
+[profile.dev]
+opt-level = 0
+
 [lib]
 name = "genalg"
 path = "src/genalg/lib.rs"
@@ -13,4 +16,6 @@ path = "src/main.rs"
 
 [dependencies]
 rand = "0.3.14"
+time = "0.1.35"
+
 

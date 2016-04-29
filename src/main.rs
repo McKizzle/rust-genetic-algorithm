@@ -1,4 +1,5 @@
 extern crate genalg;
+extern crate time;
 
 use std::error::Error;
 use std::fs::File;
@@ -36,14 +37,24 @@ pub fn main() {
     println!("------------------------------");
     
     println!("Calculating most efficient theft...");
-    let result: Speciman = simulate(&items);
+    let result: Speciman = simulate(&items, 2048);
     println!("...Done");
     println!("A winner was found! {}.", result);
 }
 
-fn simulate(items: &Vec<Item>) -> Speciman {
-    let mut testman: Speciman = Speciman::new(1, items.len());
+fn simulate(items: &Vec<Item>, pop_size: i32) -> Speciman {
+    // Create the inital population. 
+    let mut specimina: Vec<Speciman> = (0..pop_size).map(|i| { Speciman::new(i, items.len()) }).collect();
 
-    return testman;
+    let t0_s: f64 = time::precise_time_s();        
+    for j in 0..2500 {
+
+    }
+    let dt_s: f64 = time::precise_time_s() - t0_s;        
+
+    return match specimina.get(0) {
+        Some(s) => s.clone(),
+        None => Speciman::new(0, 0),
+    }
 }
 
