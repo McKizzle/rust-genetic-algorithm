@@ -43,12 +43,14 @@ pub fn main() {
 }
 
 fn simulate(items: &Vec<Item>, pop_size: i32) -> Speciman {
+    let mut_rate: f64 = 3.0 / 100.0 * items.len() as f64; 
+
     // Create the inital population. 
     let mut specimina: Vec<Speciman> = (0..pop_size).map(|i| { Speciman::new(i, items.len()) }).collect();
 
     let t0_s: f64 = time::precise_time_s();        
     for j in 0..2500 {
-
+        
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;        
 
@@ -58,3 +60,4 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Speciman {
     }
 }
 
+fn mutate_population() {}
