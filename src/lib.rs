@@ -1,5 +1,5 @@
 extern crate rand;
 
-pub mod speciman;
+pub mod specimen;
 pub mod item;
 

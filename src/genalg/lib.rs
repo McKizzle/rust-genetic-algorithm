@@ -1,3 +1,3 @@
-pub mod speciman;
+pub mod specimen;
 pub mod item;
 
