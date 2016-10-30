@@ -5,6 +5,7 @@ mod specimen {
     
     use std::fmt;
     use self::rand::Rng;
+    use item::Item;
 
     pub struct Specimen {
         pub id: i32,
@@ -59,10 +60,28 @@ mod specimen {
         }
 
         /**
-         * The fitness of the specimen.
+         * The fitness of the specimen. The penalty is applied based on the 
+         * square of the weight.
+         *
+         * TODO: It would be better if items was a vector of iterables. Then
+         *   it would be more dynamic and not limited to an Item type. 
          */
-        pub fn fitness() -> i32 {
-            0
+        pub fn fitness(&self, items: &Vec<Item>) -> f64 {
+            /*let weight: f64 =*/ 
+            let weight: f64 = self.dna.iter()
+                                       .zip(items.iter())
+                                       .filter(|t| *t.0)
+                                       .map(|t| t.1)
+                                       .map(|i| i.weight as f64)
+                                       .sum();
+            let value: f64 = self.dna.iter()
+                                     .zip(items.iter())
+                                     .filter(|t| *t.0)
+                                     .map(|t| t.1)
+                                     .map(|i| i.value as f64)
+                                     .sum();
+
+            return value / weight.powf(2.0);
         }
        
         /**
