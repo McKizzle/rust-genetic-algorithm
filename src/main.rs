@@ -37,7 +37,7 @@ pub fn main() {
     println!("------------------------------");
     
     println!("Calculating most efficient theft...");
-    let result: Specimen = simulate(&items, 2048);
+    let mut result: Specimen = simulate(&items, 2048);
     println!("...Done");
     println!("A winner was found! {}.", result);
 }
@@ -49,8 +49,8 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     let mut specimina: Vec<Specimen> = (0..pop_size).map(|i| { Specimen::new(i, items.len()) }).collect();
 
     let t0_s: f64 = time::precise_time_s();        
-    for j in 0..2500 {
-                
+    for _ in 0..2500 {
+                        
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;        
 

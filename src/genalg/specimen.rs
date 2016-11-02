@@ -4,12 +4,14 @@ mod specimen {
     extern crate rand;
     
     use std::fmt;
-    use self::rand::Rng;
+    use self::rand::Rng; // why is 'self' needed before??
+    use self::rand::distributions::{IndependentSample, Range};
     use item::Item;
 
     pub struct Specimen {
         pub id: i32,
         pub dna: Vec<bool>,
+        pub fitness: f64,
     }
 
     impl Clone for Specimen {
@@ -17,6 +19,7 @@ mod specimen {
             Specimen { 
                 id: self.id, 
                 dna: self.dna.iter().cloned().collect(),
+                fitness: 0.0,
             }
         }
 
@@ -40,6 +43,7 @@ mod specimen {
             Specimen { 
                 id: id, 
                 dna: rand::thread_rng().gen_iter::<bool>().take(dna_len).collect::<Vec<bool>>(),
+                fitness: 0.0,
             }
         }
 
@@ -56,6 +60,7 @@ mod specimen {
                                               .take(mate2.dna.len() / 2))
                               .cloned()
                               .collect::<Vec<bool>>(),
+                fitness: 0.0,
             }
         }
 
@@ -66,8 +71,7 @@ mod specimen {
          * TODO: It would be better if items was a vector of iterables. Then
          *   it would be more dynamic and not limited to an Item type. 
          */
-        pub fn fitness(&self, items: &Vec<Item>) -> f64 {
-            /*let weight: f64 =*/ 
+        pub fn fitness(&mut self, items: &Vec<Item>) {
             let weight: f64 = self.dna.iter()
                                        .zip(items.iter())
                                        .filter(|t| *t.0)
@@ -81,14 +85,35 @@ mod specimen {
                                      .map(|i| i.value as f64)
                                      .sum();
 
-            return value / weight.powf(2.0);
+            self.fitness = value / weight.powf(2.0);
         }
        
         /**
          * TODO: Mutation function for a specimen. 
          */
-        pub fn mutate() {
-            
+        pub fn mutate(&mut self, mutation_rate: f64) {
+            let mut i = self.geometric_distribution(mutation_rate) as usize;
+
+            while i < self.dna.len() {
+                i += self.geometric_distribution(mutation_rate) as usize;
+
+                println!("i = {}", i);
+            }
+        }
+
+        fn geometric_distribution(&self, prob: f64) -> i32 {
+            let min: f64 = 0.0;
+            let max: f64 = 2.0f64.powf(32f64);
+
+            let between = Range::new(min, max);
+            let mut rng = rand::thread_rng();
+
+            let uniform: f64 = between.ind_sample(&mut rng) / max;
+
+            let b10: f64 = 10f64;
+            let gd: f64 = (uniform.log(b10) / (1.0 - prob).log(b10)).ceil();
+
+            return gd as i32;
         }
     }
 }
