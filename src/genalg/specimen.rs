@@ -30,11 +30,15 @@ mod specimen {
 
     impl fmt::Display for Specimen {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            let _ = write!(f, "Specimen {}: [", self.id);
+            let _ = write!(f, "Specimen {{\n");
+            let _ = write!(f, " id: {}\n", self.id);
+            let _ = write!(f, " fitness: {}\n", self.fitness);
+            let _ = write!(f, " dna: [");
             for gene in &self.dna[0 .. &self.dna.len() - 1] {
-                let _ = write!(f, "{}, ", gene);
+                let _ = write!(f, "{}, ", *gene as i32);
             }
-            write!(f, "{}]", &self.dna[self.dna.len() - 1])
+            let _ = write!(f, "{}]\n", *&self.dna[self.dna.len() - 1] as i32);
+            write!(f, "}}")
         }
     }
 
@@ -50,7 +54,7 @@ mod specimen {
         /**
          * Generates a new Specimen using two existing specimen. Single point crossover is used. 
          */
-        pub fn procreate(mate1: Specimen, mate2: Specimen) -> Specimen {
+        pub fn procreate(mate1: &Specimen, mate2: &Specimen) -> Specimen {
             Specimen { 
                 id: 1, 
                 dna: mate1.dna.iter()

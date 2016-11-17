@@ -1,5 +1,7 @@
 extern crate genalg;
 extern crate time;
+extern crate ordered_float;
+extern crate rand;
 
 use std::error::Error;
 use std::fs::File;
@@ -8,6 +10,10 @@ use std::io::BufReader;
 
 use genalg::specimen::Specimen;
 use genalg::item::Item;
+
+use ordered_float::OrderedFloat;
+    
+use rand::Rng; 
 
 pub fn main() {
     let items_file: File = match File::open("data/items.txt") {
@@ -48,11 +54,29 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     // Create the inital population. 
     let mut specimina: Vec<Specimen> = (0..pop_size).map(|i| { Specimen::new(i, items.len()) }).collect();
 
+
     let t0_s: f64 = time::precise_time_s();        
-    for _ in 0..2500 {
-                        
+    for _ in 0..100 {
+        for s in &mut specimina {
+            s.fitness(items);
+        }
+        specimina.sort_by(|s1, s2| OrderedFloat(s1.fitness).cmp(&OrderedFloat(s2.fitness)).reverse());
+
+        let mut new_pop: Vec<Specimen>; 
+        {
+            let mating_candidates: &[Specimen] = &specimina[0 .. 127];
+            new_pop = mate_population(mating_candidates, 256);
+            
+            for s in &mut new_pop {
+                s.fitness(items);
+            }
+        }
+        //specimina.extend(new_pop.iter().map(|&s| s));
+        
+        break;
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;        
+    println!("Total time: {}", dt_s);
 
     return match specimina.get(0) {
         Some(s) => s.clone(),
@@ -60,4 +84,21 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     }
 }
 
-fn mutate_population() {}
+fn mate_population(population: &[Specimen], max_offspring: usize) -> Vec<Specimen> {
+    let mut children: Vec<Specimen> = Vec::new();
+
+    while children.len() < max_offspring {
+        let parent1 = match rand::thread_rng().choose(&population) {
+            Some(x) => x,
+            None => continue,
+        };
+        let parent2 = match rand::thread_rng().choose(&population) {
+            Some(x) => x,
+            None => continue,
+        };
+
+        children.push(Specimen::procreate(parent1, parent2));
+    }
+
+    return children;
+}
