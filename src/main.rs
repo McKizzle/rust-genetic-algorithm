@@ -44,6 +44,7 @@ pub fn main() {
     
     println!("Calculating most efficient theft...");
     let mut result: Specimen = simulate(&items, 2048);
+    result.fitness(&items);
     println!("...Done");
     println!("A winner was found! {}.", result);
 }
@@ -56,24 +57,17 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
 
 
     let t0_s: f64 = time::precise_time_s();        
-    for _ in 0..100 {
+    for i in 0..1000 {
+        println!("Iteration {}", i);
         for s in &mut specimina {
             s.fitness(items);
         }
         specimina.sort_by(|s1, s2| OrderedFloat(s1.fitness).cmp(&OrderedFloat(s2.fitness)).reverse());
 
-        let mut new_pop: Vec<Specimen>; 
-        {
-            let mating_candidates: &[Specimen] = &specimina[0 .. 127];
-            new_pop = mate_population(mating_candidates, 256);
-            
-            for s in &mut new_pop {
-                s.fitness(items);
-            }
-        }
-        //specimina.extend(new_pop.iter().map(|&s| s));
+        let offspring = create_offspring(items, &specimina, 127, 256);
+        specimina.extend(offspring.iter().cloned());
         
-        break;
+        run_natural_selection(&mut specimina, items, 10, 1024);     
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;        
     println!("Total time: {}", dt_s);
@@ -82,6 +76,39 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
         Some(s) => s.clone(),
         None => Specimen::new(0, 0),
     }
+}
+
+fn run_natural_selection(specimina: &mut Vec<Specimen>, items: &Vec<Item>, n: usize, max_allowed_size: usize) {
+    specimina.sort_by(|s1, s2| OrderedFloat(s1.fitness).cmp(&OrderedFloat(s2.fitness)).reverse());
+ 
+    let total_fitness: f64 = specimina.iter().map(|s| s.fitness).sum();
+    let mut total_prob = specimina.iter().map(|s| s.fitness / total_fitness).sum();
+    
+    let mut survivors: Vec<Specimen> = Vec::new(); 
+    survivors.extend(specimina.iter().filter(|s| {
+        let prob = s.fitness / total_fitness;
+        total_prob -= prob;
+        return rand::thread_rng().next_f64() <= total_prob;
+    }).cloned());
+
+    let mut elites: Vec<Specimen> = specimina.drain(0..n).collect();
+    survivors.extend(elites.iter().cloned());
+
+    specimina.clear();
+    specimina.extend(survivors.iter().cloned());
+}
+
+fn create_offspring(items: &Vec<Item>, specimina: &Vec<Specimen>, cand_pool_size: usize, max_offspring: usize) -> Vec<Specimen> {
+    let cps = if cand_pool_size >= specimina.len() { specimina.len() } else { cand_pool_size };
+
+    let mating_candidates: &[Specimen] = &specimina[0 .. cps];
+    let mut new_pop: Vec<Specimen> = mate_population(mating_candidates, max_offspring);
+    
+    for s in &mut new_pop {
+        s.fitness(items);
+    }
+
+    return new_pop;
 }
 
 fn mate_population(population: &[Specimen], max_offspring: usize) -> Vec<Specimen> {
