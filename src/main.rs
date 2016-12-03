@@ -10,6 +10,7 @@ use std::io::BufReader;
 
 use genalg::specimen::Specimen;
 use genalg::item::Item;
+use genalg::selected::biggest;
 
 use ordered_float::OrderedFloat;
     
@@ -64,6 +65,8 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
         }
         specimina.sort();
         specimina.reverse();
+
+//        let tmp = 
 
         let offspring = create_offspring(items, &specimina, 127, 256);
         specimina.extend(offspring.iter().cloned());
