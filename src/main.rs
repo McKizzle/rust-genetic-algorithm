@@ -62,12 +62,13 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
         for s in &mut specimina {
             s.fitness(items);
         }
-        specimina.sort_by(|s1, s2| OrderedFloat(s1.fitness).cmp(&OrderedFloat(s2.fitness)).reverse());
+        specimina.sort();
+        specimina.reverse();
 
         let offspring = create_offspring(items, &specimina, 127, 256);
         specimina.extend(offspring.iter().cloned());
         
-        run_natural_selection(&mut specimina, items, 10, 1024);     
+        run_natural_selection(&mut specimina, 10, 1024);
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;        
     println!("Total time: {}", dt_s);
@@ -78,8 +79,9 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     }
 }
 
-fn run_natural_selection(specimina: &mut Vec<Specimen>, items: &Vec<Item>, n: usize, max_allowed_size: usize) {
-    specimina.sort_by(|s1, s2| OrderedFloat(s1.fitness).cmp(&OrderedFloat(s2.fitness)).reverse());
+fn run_natural_selection(specimina: &mut Vec<Specimen>, n: usize, max_allowed_size: usize) {
+    specimina.sort();
+    specimina.reverse();
  
     let total_fitness: f64 = specimina.iter().map(|s| s.fitness).sum();
     let mut total_prob = specimina.iter().map(|s| s.fitness / total_fitness).sum();

@@ -7,7 +7,9 @@ mod specimen {
     use self::rand::Rng; // why is 'self' needed before??
     use self::rand::distributions::{IndependentSample, Range};
     use item::Item;
+    use std::cmp::Ordering;
 
+    #[derive(Debug)]
     pub struct Specimen {
         pub id: i32,
         pub dna: Vec<bool>,
@@ -27,6 +29,26 @@ mod specimen {
             unimplemented!(); 
         } 
     }
+
+    impl Ord for Specimen {
+        fn cmp(&self, other: &Specimen) -> Ordering {
+            self.partial_cmp(other).unwrap()
+        }
+    }
+
+    impl PartialOrd for Specimen {
+        fn partial_cmp(&self, other: &Specimen) -> Option<Ordering> {
+            self.fitness.partial_cmp(&other.fitness)
+        }
+    }
+
+    impl PartialEq for Specimen {
+        fn eq(&self, other: &Specimen) -> bool {
+            self.dna.eq(&other.dna)
+        }
+    }
+
+    impl Eq for Specimen { }
 
     impl fmt::Display for Specimen {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
