@@ -22,7 +22,7 @@ impl PartialOrd for Selected {
     }
 }
 
-impl Eq for Selected { }
+impl Eq for Selected {}
 
 impl PartialEq for Selected {
     fn eq(&self, other: &Selected) -> bool {
@@ -50,7 +50,7 @@ pub fn biggest(n: usize, specimina: &[Specimen]) -> Vec<usize> {
             i: i,
         }
     }) {
-        if s <= *biggest.peek().unwrap() {
+        if s < *biggest.peek().unwrap() {
             biggest.pop();
             biggest.push(s);
         }
@@ -83,7 +83,6 @@ mod tests {
     fn biggest_none() {
         let b = biggest(0, &[s(1.0)]);
 
-        println!("{:?}", b);
         assert!(b.is_empty());
     }
 
@@ -99,7 +98,32 @@ mod tests {
         let mut splc: &[Specimen] = &[s(5.0), s(1.0), s(4.0), s(2.0), s(0.0), s(3.0)];
         let mut b = biggest(3, splc);
         b.sort();
+        let expected = vec![0, 2, 5];
 
-        assert_eq!(b, vec![0, 2, 5]);
+        assert_eq!(b, expected);
+    }
+
+    quickcheck! {
+        fn same_as_sorting(n: usize, weights: Vec<f64>) -> bool {
+            let mut spec: Vec<Specimen> = weights.into_iter().map(s).collect();
+            // Fancy new method
+            let mut fast = biggest(n, &spec);
+            // Original method
+            let mut enumerated: Vec<_> = spec
+                .iter()
+                .enumerate()
+                .collect();
+            enumerated.sort_by_key(|e| e.1);
+            let mut slow: Vec<_> = enumerated
+                .into_iter()
+                .rev()
+                .map(|e| e.0)
+                .take(n)
+                .collect();
+            // Should be the same
+            fast.sort();
+            slow.sort();
+            fast == slow
+        }
     }
 }
