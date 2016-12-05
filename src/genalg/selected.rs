@@ -108,21 +108,21 @@ mod tests {
             let mut spec: Vec<Specimen> = weights.into_iter().map(s).collect();
             // Fancy new method
             let mut fast = biggest(n, &spec);
-            fast.sort();
-            fast.reverse();
             // Original method
             let mut enumerated: Vec<_> = spec
                 .iter()
                 .enumerate()
                 .collect();
             enumerated.sort_by_key(|e| e.1);
-            let slow: Vec<_> = enumerated
+            let mut slow: Vec<_> = enumerated
                 .into_iter()
                 .rev()
                 .map(|e| e.0)
                 .take(n)
                 .collect();
             // Should be the same
+            fast.sort();
+            slow.sort();
             fast == slow
         }
     }
