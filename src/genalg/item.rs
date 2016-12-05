@@ -10,4 +10,3 @@ impl fmt::Display for Item {
         write!(f, "Item [{}w, {}v]", &self.weight, &self.value)
     }
 }
-
