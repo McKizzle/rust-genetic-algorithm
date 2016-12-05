@@ -4,7 +4,7 @@ use std::iter::FromIterator;
 
 use specimen::Specimen;
 
-#[derive(PartialEq, PartialOrd, Debug)]
+#[derive(Debug)]
 struct Selected {
     pub w: f64,
     pub i: usize,
@@ -12,11 +12,23 @@ struct Selected {
 
 impl Ord for Selected {
     fn cmp(&self, other: &Selected) -> Ordering {
-        self.partial_cmp(other).unwrap().reverse()
+        other.partial_cmp(self).unwrap()
     }
 }
 
-impl Eq for Selected {}
+impl PartialOrd for Selected {
+    fn partial_cmp(&self, other: &Selected) -> Option<Ordering> {
+        other.w.partial_cmp(&self.w)
+    }
+}
+
+impl Eq for Selected { }
+
+impl PartialEq for Selected {
+    fn eq(&self, other: &Selected) -> bool {
+        self.w == other.w
+    }
+}
 
 pub fn biggest(n: usize, specimina: &[Specimen]) -> Vec<usize> {
     if specimina.is_empty() || n == 0 {
@@ -38,7 +50,7 @@ pub fn biggest(n: usize, specimina: &[Specimen]) -> Vec<usize> {
             i: i,
         }
     }) {
-        if s > *biggest.peek().unwrap() {
+        if s <= *biggest.peek().unwrap() {
             biggest.pop();
             biggest.push(s);
         }
@@ -55,7 +67,7 @@ mod tests {
     fn s(f: f64) -> Specimen {
         Specimen {
             id: 1,
-            fitness: 10.0,
+            fitness: f,
             dna: Vec::new(),
         }
     }
@@ -84,10 +96,10 @@ mod tests {
 
     #[test]
     fn biggest_three_of_size() {
-        let mut b = biggest(3, &[s(5.0), s(1.0), s(4.0), s(2.0), s(0.0), s(3.0)]);
+        let mut splc: &[Specimen] = &[s(5.0), s(1.0), s(4.0), s(2.0), s(0.0), s(3.0)];
+        let mut b = biggest(3, splc);
         b.sort();
-        let expected = vec![0, 2, 5];
 
-        assert_eq!(b, expected);
+        assert_eq!(b, vec![0, 2, 5]);
     }
 }
