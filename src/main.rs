@@ -1,6 +1,5 @@
 extern crate genalg;
 extern crate time;
-extern crate ordered_float;
 extern crate rand;
 
 use std::error::Error;
@@ -11,8 +10,6 @@ use std::io::BufReader;
 use genalg::specimen::Specimen;
 use genalg::item::Item;
 use genalg::selected::biggest;
-
-use ordered_float::OrderedFloat;
 
 use rand::Rng;
 
