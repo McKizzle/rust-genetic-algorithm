@@ -10,12 +10,14 @@ opt-level = 0
 name = "genalg"
 path = "src/genalg/lib.rs"
 
-[[bin]]    
-name = "genalg_runner"    
+[[bin]]
+name = "genalg_runner"
 path = "src/main.rs"
 
 [dependencies]
-rand = "0.3.14"
-time = "0.1.35"
-ordered-float = "0.3.0"
+rand = "*"
+time = "*"
+ordered-float = "*"
 
+[dev-dependencies]
+quickcheck = "*"
