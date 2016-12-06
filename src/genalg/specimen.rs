@@ -142,3 +142,105 @@ impl Specimen {
         return gd as i32;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Specimen;
+
+    #[test]
+    fn id_correct_value() {
+        let s = Specimen::new(1, 0);
+        assert_eq!(s.id, 1);
+    } 
+
+    #[test]
+    fn dna_correct_length_0() {
+        let expected = 0;
+        let s = Specimen::new(1, expected);
+        assert_eq!(s.dna.len(), expected);
+    }
+    
+    #[test]
+    fn dna_correct_length_10() {
+        let expected = 10;
+        let s = Specimen::new(1, expected);
+        assert_eq!(s.dna.len(), expected);
+    }
+    
+    #[test]
+    fn procreate_id() {
+        let s1 = Specimen::new(1, 0);
+        let s2 = Specimen::new(1, 0);
+        
+        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.id, sExpected.id);
+    }
+    
+    #[test]
+    fn procreate_fitness() {
+        let s1 = Specimen::new(1, 0);
+        let s2 = Specimen::new(1, 0);
+        
+        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.fitness, sExpected.fitness);
+    }
+    
+    #[test]
+    fn procreate_dna_len_0() {
+        let s1 = Specimen::new(1, 0);
+        let s2 = Specimen::new(1, 0);
+        
+        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.dna, sExpected.dna);
+    }
+    
+    #[test]
+    fn procreate_dna_len_1() {
+        let s1 = Specimen{ id: 1, dna: vec!(true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(false), fitness: 0.0 };
+        
+        let sExpected = Specimen{ id: 1, dna: vec!(true), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.dna, sExpected.dna);
+    }
+
+    #[test]
+    fn procreate_dna_len_2() {
+        let s1 = Specimen{ id: 1, dna: vec!(true, true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(false, false), fitness: 0.0 };
+        
+        let sExpected = Specimen{ id: 1, dna: vec!(true, false), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.dna, sExpected.dna);
+    }
+
+    #[test]
+    fn procreate_dna_even_length() {
+        let s1 = Specimen{ id: 1, dna: vec!(true, true, true, true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(false, false, false, false), fitness: 0.0 };
+
+        let sExpected = Specimen{ id: 1, dna: vec!(true, true, false, false), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.dna, sExpected.dna);
+    }
+    
+    #[test]
+    fn procreate_dna_even_odd() {
+        let s1 = Specimen{ id: 1, dna: vec!(true, true, true, true, true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(false, false, false, false, false), fitness: 0.0 };
+
+        let sExpected = Specimen{ id: 1, dna: vec!(true, true, true, false, false), fitness: 0.0 };
+        let sActual = Specimen::procreate(&s1, &s2);
+
+        assert_eq!(sActual.dna, sExpected.dna);
+    }
+}
