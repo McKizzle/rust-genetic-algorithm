@@ -145,7 +145,7 @@ fn mate_population(population: &[Specimen], max_offspring: usize) -> Vec<Specime
             None => continue,
         };
 
-        children.push(Specimen::procreate(parent1, parent2));
+        children.push(Specimen::procreate(parent1, parent2).unwrap());
     }
 
     return children;

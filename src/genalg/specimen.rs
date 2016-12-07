@@ -72,19 +72,20 @@ impl Specimen {
     /**
      * Generates a new Specimen using two existing specimen. Single point crossover is used.
      */
-    pub fn procreate(mate1: &Specimen, mate2: &Specimen) -> Specimen {
-        Specimen {
-            id: 1,
-            dna: mate1.dna
-                .iter()
-                .take(mate1.dna.len() / 2)
-                .chain(mate2.dna
-                    .iter()
-                    .rev()
-                    .take(mate2.dna.len() / 2))
-                .cloned()
-                .collect::<Vec<bool>>(),
-            fitness: 0.0,
+    pub fn procreate<'a>(mate1: &'a Specimen, mate2: &'a Specimen) -> Result<Specimen, &'a str> {
+        let take_amount = mate1.dna.len() - (mate1.dna.len() / 2);
+        match mate1.dna.len() == mate2.dna.len() {
+            true => Ok(Specimen { id: 1,
+                                  dna: mate1.dna
+                                            .iter()
+                                            .take(take_amount)
+                                            .chain(mate2.dna.iter()
+                                                            .rev()
+                                                            .take(mate2.dna.len() - take_amount))
+                                            .cloned()
+                                            .collect::<Vec<bool>>(),
+                                  fitness: 0.0 }),
+            false => Err("The dna lengths of the mates do not match"),
         }
     }
 
@@ -172,10 +173,10 @@ mod tests {
         let s1 = Specimen::new(1, 0);
         let s2 = Specimen::new(1, 0);
         
-        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.id, sExpected.id);
+        assert_eq!(actual.id, expected.id);
     }
     
     #[test]
@@ -183,10 +184,10 @@ mod tests {
         let s1 = Specimen::new(1, 0);
         let s2 = Specimen::new(1, 0);
         
-        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.fitness, sExpected.fitness);
+        assert_eq!(actual.fitness, expected.fitness);
     }
     
     #[test]
@@ -194,10 +195,10 @@ mod tests {
         let s1 = Specimen::new(1, 0);
         let s2 = Specimen::new(1, 0);
         
-        let sExpected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: Vec::new(), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.dna, sExpected.dna);
+        assert_eq!(actual.dna, expected.dna);
     }
     
     #[test]
@@ -205,10 +206,10 @@ mod tests {
         let s1 = Specimen{ id: 1, dna: vec!(true), fitness: 0.0 };
         let s2 = Specimen{ id: 1, dna: vec!(false), fitness: 0.0 };
         
-        let sExpected = Specimen{ id: 1, dna: vec!(true), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: vec!(true), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.dna, sExpected.dna);
+        assert_eq!(actual.dna, expected.dna);
     }
 
     #[test]
@@ -216,10 +217,10 @@ mod tests {
         let s1 = Specimen{ id: 1, dna: vec!(true, true), fitness: 0.0 };
         let s2 = Specimen{ id: 1, dna: vec!(false, false), fitness: 0.0 };
         
-        let sExpected = Specimen{ id: 1, dna: vec!(true, false), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: vec!(true, false), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.dna, sExpected.dna);
+        assert_eq!(actual.dna, expected.dna);
     }
 
     #[test]
@@ -227,10 +228,10 @@ mod tests {
         let s1 = Specimen{ id: 1, dna: vec!(true, true, true, true), fitness: 0.0 };
         let s2 = Specimen{ id: 1, dna: vec!(false, false, false, false), fitness: 0.0 };
 
-        let sExpected = Specimen{ id: 1, dna: vec!(true, true, false, false), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: vec!(true, true, false, false), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.dna, sExpected.dna);
+        assert_eq!(actual.dna, expected.dna);
     }
     
     #[test]
@@ -238,9 +239,19 @@ mod tests {
         let s1 = Specimen{ id: 1, dna: vec!(true, true, true, true, true), fitness: 0.0 };
         let s2 = Specimen{ id: 1, dna: vec!(false, false, false, false, false), fitness: 0.0 };
 
-        let sExpected = Specimen{ id: 1, dna: vec!(true, true, true, false, false), fitness: 0.0 };
-        let sActual = Specimen::procreate(&s1, &s2);
+        let expected = Specimen{ id: 1, dna: vec!(true, true, true, false, false), fitness: 0.0 };
+        let actual = Specimen::procreate(&s1, &s2).unwrap();
 
-        assert_eq!(sActual.dna, sExpected.dna);
+        assert_eq!(actual.dna, expected.dna);
     }
+
+    #[test]
+    fn procreate_dna_len_mismatch() {
+        let s1 = Specimen{ id: 1, dna: vec!(true, true, true, true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(false, false, false, false, false), fitness: 0.0 };
+
+        assert_eq!(Specimen::procreate(&s1, &s2), Err("The dna lengths of the mates do not match"));
+    }
+
+    
 }
