@@ -115,38 +115,57 @@ impl Specimen {
         self.fitness = value / weight.powf(2.0);
     }
 
+    pub fn total_value(self, items: &Vec<Item>) -> i32 {
+        self.dna
+            .iter()
+            .zip(items.iter())
+            .filter(|t| *t.0)
+            .map(|t| t.1)
+            .map(|i| i.value)
+            .sum()
+    }
+
     /**
-     * TODO: Mutation function for a specimen.
+     * A mutation function for the speciman simulates DNA mutations. The
+     * mutation rate is effectivly the probability per nucliotide that there 
+     * will be an alteration. 
      */
-    pub fn mutate(&mut self, mutation_rate: f64) {
-        let mut i = self.geometric_distribution(mutation_rate) as usize;
-
+    pub fn mutate(&mut self, prob: f64) {
+        if prob <= 0.0 {
+            return;
+        }
+        
+        let mut i = geometric_distribution(prob) as usize;
         while i < self.dna.len() {
-            i += self.geometric_distribution(mutation_rate) as usize;
-
-            println!("i = {}", i);
+            self.dna[i] = !self.dna[i]; // perform the bit flip. 
+            i += geometric_distribution(prob) as usize;
         }
     }
-
-    fn geometric_distribution(&self, prob: f64) -> i32 {
-        let min: f64 = 0.0;
-        let max: f64 = 2.0f64.powf(32f64);
-
-        let between = Range::new(min, max);
-        let mut rng = rand::thread_rng();
-
-        let uniform: f64 = between.ind_sample(&mut rng) / max;
-
-        let b10: f64 = 10f64;
-        let gd: f64 = (uniform.log(b10) / (1.0 - prob).log(b10)).ceil();
-
-        return gd as i32;
-    }
 }
+
+/**
+ * Calculates an integer using the gemetric distribution. 
+ */
+fn geometric_distribution(prob: f64) -> f64 {
+    let min: f64 = 0.0;
+    let max: f64 = 2.0f64.powf(32f64);
+
+    let between = Range::new(min, max);
+    let mut rng = rand::thread_rng();
+
+    let uniform: f64 = between.ind_sample(&mut rng) / max;
+
+    let b10: f64 = 10f64;
+    let gd: f64 = uniform.log(b10) / (1.0 - prob).log(b10);
+
+    return gd;
+}
+    
 
 #[cfg(test)]
 mod tests {
     use super::Specimen;
+    use super::geometric_distribution;
 
     #[test]
     fn id_correct_value() {
@@ -253,5 +272,12 @@ mod tests {
         assert_eq!(Specimen::procreate(&s1, &s2), Err("The dna lengths of the mates do not match"));
     }
 
-    
+    #[test]
+    fn mutate_zero_has_no_effect() {
+        let mut s1 = Specimen{ id: 1, dna: vec!(true, true, true, true), fitness: 0.0 };
+        let s2 = Specimen{ id: 1, dna: vec!(true, true, true, true), fitness: 0.0 };
+
+        s1.mutate(0.0);
+        assert_eq!(s1, s2);
+    }
 }

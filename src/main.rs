@@ -53,6 +53,7 @@ pub fn main() {
     result.fitness(&items);
     println!("...Done");
     println!("A winner was found! {}.", result);
+    println!("The total value of stolen goods was: {}", result.total_value(&items));
 }
 
 fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
@@ -68,30 +69,29 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
         println!("Iteration {}", i);
         for s in &mut specimina {
             s.fitness(items);
+            s.mutate(mut_rate);
         }
         specimina.sort();
         specimina.reverse();
 
-        //        let tmp =
-
         let offspring = create_offspring(items, &specimina, 127, 256);
         specimina.extend(offspring.iter().cloned());
 
-        run_natural_selection(&mut specimina, 10, 1024);
+        run_natural_selection(&mut specimina, 10);
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;
     println!("Total time: {}", dt_s);
 
-    return match specimina.get(0) {
+
+    let best = biggest(1, &specimina);
+    return match specimina.get(best[0]) {
         Some(s) => s.clone(),
         None => Specimen::new(0, 0),
     };
 }
 
-fn run_natural_selection(specimina: &mut Vec<Specimen>, n: usize, max_allowed_size: usize) {
-    specimina.sort();
-    specimina.reverse();
 
+fn run_natural_selection(specimina: &mut Vec<Specimen>, n: usize) {
     let total_fitness: f64 = specimina.iter().map(|s| s.fitness).sum();
     let mut total_prob = specimina.iter().map(|s| s.fitness / total_fitness).sum();
 
@@ -104,11 +104,15 @@ fn run_natural_selection(specimina: &mut Vec<Specimen>, n: usize, max_allowed_si
         })
         .cloned());
 
-    let mut elites: Vec<Specimen> = specimina.drain(0..n).collect();
-    survivors.extend(elites.iter().cloned());
-
+    let best = biggest(n, specimina);
+    let mut elites: Vec<Specimen> = Vec::new();
+    for &i in best.iter() {
+        elites.push(specimina[i].clone());
+    }
+    
     specimina.clear();
     specimina.extend(survivors.iter().cloned());
+    specimina.extend(elites.iter().cloned());
 }
 
 fn create_offspring(items: &Vec<Item>,
