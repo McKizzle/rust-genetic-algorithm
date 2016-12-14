@@ -63,7 +63,6 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     let mut specimina: Vec<Specimen> =
         (0..pop_size).map(|i| Specimen::new(i, items.len())).collect();
 
-
     let t0_s: f64 = time::precise_time_s();
     for i in 0..1000 {
         println!("Iteration {}", i);
@@ -89,7 +88,6 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
         None => Specimen::new(0, 0),
     };
 }
-
 
 fn run_natural_selection(specimina: &mut Vec<Specimen>, n: usize) {
     let total_fitness: f64 = specimina.iter().map(|s| s.fitness).sum();

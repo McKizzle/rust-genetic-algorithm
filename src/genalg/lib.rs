@@ -7,3 +7,4 @@ extern crate quickcheck;
 pub mod specimen;
 pub mod item;
 pub mod selected;
+pub mod population;
