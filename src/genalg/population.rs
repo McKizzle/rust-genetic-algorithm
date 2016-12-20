@@ -40,7 +40,7 @@ impl Population {
      * @param: prioritize elites in mating and survival.
      * @param: protect the elites from alterations or deletions. 
      */
-    pub fn cyccle(&mut self, 
+    pub fn cycle(&mut self, 
                   items: &Vec<Item>, 
                   mutation_rate: f64, 
                   prioritize_elites: bool, 
@@ -65,12 +65,9 @@ impl Population {
      * Updates the fitness values of a given vector of speciman.
      */
     fn calculate_fitnesses(&mut self, items: &Vec<Item>) {
-        self.population = self.population.iter()
-            .cloned()
-            .map(|mut p| {
-                p.fitness(items);
-                p
-            }).collect();
+        for s in self.population.iter_mut() {
+            s.fitness(items);
+        }
     }
 
     /**
@@ -97,34 +94,28 @@ impl Population {
      * Kill off unfit members of the population. 
      */
     fn run_natural_selection(&mut self, protect_top_n: usize) {
+        let mut next_gen = Vec::new(); 
+        
         let total_fitness: f64 = self.population.iter().map(|s| s.fitness).sum();
         let mut total_prob = self.population.iter().map(|s| s.fitness / total_fitness).sum();
-
-        let mut survivors: Vec<Specimen> = self.population
-            .iter()
+        
+        let best = biggest(protect_top_n, &self.population);
+        for &i in best.iter() {
+            next_gen.push(self.population[i].clone());
+        }
+        
+        next_gen.extend(biggest(protect_top_n, &self.population).iter().map(|&i| self.population[i].clone()));
+        next_gen.extend(self.population
+            .drain(..)
             .filter(|s| {
                 let prob = s.fitness / total_fitness;
                 total_prob -= prob;
                 return rand::thread_rng().next_f64() <= total_prob;
             })
-            .cloned()
             .map(|mut s| {
                 s.mutate(3f64/50f64);
                 s
-            })
-            .collect();
-
-
-        let best = biggest(protect_top_n, &self.population);
-        let mut elites: Vec<Specimen> = Vec::new();
-        for &i in best.iter() {
-            elites.push(self.population[i].clone());
-        }
-
-        self.population = survivors.iter()
-            .chain(elites.iter())
-            .cloned()
-            .collect();
+            }));
     }
 
     pub fn get_most_fit(&self) -> Option<&Specimen> {
