@@ -43,7 +43,6 @@ impl Population {
     pub fn cycle(&mut self, 
                   items: &Vec<Item>, 
                   mutation_rate: f64, 
-                  prioritize_elites: bool, 
                   protect_elites: bool) { 
         // 1: Calculate the fitnesses. 
         self.calculate_fitnesses(items);
@@ -55,9 +54,9 @@ impl Population {
         // 3: Kill off population memebers based on their fitness. 
         if protect_elites {
             let max_elites = self.max_elites;
-            self.run_natural_selection(max_elites);
+            self.run_natural_selection(max_elites, mutation_rate);
         } else {
-            self.run_natural_selection(0);
+            self.run_natural_selection(0, mutation_rate);
         }
     }
     
@@ -93,7 +92,7 @@ impl Population {
     /**
      * Kill off unfit members of the population. 
      */
-    fn run_natural_selection(&mut self, protect_top_n: usize) {
+    fn run_natural_selection(&mut self, protect_top_n: usize, mutation_rate: f64) {
         let mut next_gen = Vec::new(); 
         
         let total_fitness: f64 = self.population.iter().map(|s| s.fitness).sum();
@@ -113,9 +112,11 @@ impl Population {
                 return rand::thread_rng().next_f64() <= total_prob;
             })
             .map(|mut s| {
-                s.mutate(3f64/50f64);
+                s.mutate(mutation_rate);
                 s
             }));
+
+        self.population = next_gen;
     }
 
     pub fn get_most_fit(&self) -> Option<&Specimen> {

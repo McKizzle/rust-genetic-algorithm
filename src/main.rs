@@ -10,9 +10,6 @@ use std::io::BufReader;
 use genalg::population::Population;
 use genalg::specimen::Specimen;
 use genalg::item::Item;
-use genalg::selected::biggest;
-
-use rand::Rng;
 
 pub fn main() {
     let items_file: File = match File::open("data/items.txt") {
@@ -63,8 +60,8 @@ fn simulate(items: &Vec<Item>, pop_size: i32) -> Specimen {
     let mut population = Population::new(pop_size as usize, 10, (pop_size * 2) as usize, items.len());
 
     let t0_s: f64 = time::precise_time_s();
-    for i in 0..1000 {
-        population.cycle(items, 3f64/50f64, true, true);
+    for _ in 0..1000 {
+        population.cycle(items, mut_rate, true);
     }
     let dt_s: f64 = time::precise_time_s() - t0_s;
     println!("Total time: {}", dt_s);
