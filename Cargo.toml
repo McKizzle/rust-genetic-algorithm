@@ -6,6 +6,10 @@ authors = ["Clinton McKay <mckizzle@users.noreply.github.com>"]
 [profile.dev]
 opt-level = 0
 
+[profile.release]
+opt-level = 3
+debug = false
+
 [lib]
 name = "genalg"
 path = "src/genalg/lib.rs"

@@ -2,17 +2,32 @@ extern crate genalg;
 extern crate time;
 extern crate rand;
 
+#[link(name = "-s EXPORTED_FUNCTIONS=['_external_main', '_hello_test']")]
+#[link(name = "-s DEMANGLE_SUPPORT=1")]
+extern {}
+
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::path::Path;
 
 use genalg::population::Population;
 use genalg::specimen::Specimen;
 use genalg::item::Item;
 
 pub fn main() {
-    let items_file: File = match File::open("data/items.txt") {
+    external_main("data/items.txt");
+}
+
+#[no_mangle]
+pub fn hello_test() {
+    println!("Testing Rust!");
+}
+
+#[no_mangle]
+pub fn external_main(itemsPath: &str) {
+    let items_file: File = match File::open(Path::new(itemsPath)) {
         Err(why) => panic!("Failed to open the file: {}", Error::description(&why)),
         Ok(file) => file,
     };
