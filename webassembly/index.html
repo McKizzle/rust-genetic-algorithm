@@ -1,37 +1,34 @@
 <script type='text/javascript'>
-  // var Module = {
-  //   onRuntimeInitialized: function() {
-  //     var data = "hello.txt";
-  //     Module._external_main(data);
-  //   }
-  // };
-
-  // fetch('main.wasm').then(function(resp) { 
-  //   return resp.arrayBuffer();
-  // }).then(function(bytes) {
-  //   return WebAssembly.instantiate(bytes, _external_main);
-  // }).then(function(results) {
-  //   return instance.exports._external_main("test");
-  // });
+  var Module = {};
 
   fetch('main.wasm')
     .then(response => response.arrayBuffer())
     .then(buffer => {
-      var Module = {
-          wasmBinary: buffer,
-          onRuntimeInitialized: function() {
-            var script = document.createElement('script');
-            script.src = "main.js";
-            script.onload = function() {
-              console.log("Emscripten boilerplate loaded.")
-              //const n = "hello";
-              //const result = _external_main(n);
-              //console.log(`result: ${result}`);
-              _hello_test();
-            }
-            document.body.appendChild(script);
-          }
+      Module.wasmBinary = buffer;
+      Module._main = function() {
+        _hello_test();
+      }
+
+      var script = document.createElement("script");
+      script.src = "main.js";
+      script.onload = function() {
+        console.log("Emscripten boilerplate loaded.");
       };
+      // var Module = {
+      //     wasmBinary: buffer,
+      //     onRuntimeInitialized: function() {
+      //       var script = document.createElement('script');
+      //       script.src = "main.js";
+      //       script.onload = function() {
+      //         console.log("Emscripten boilerplate loaded.")
+      //         //const n = "hello";
+      //         //const result = _external_main(n);
+      //         //console.log(`result: ${result}`);
+      //         _hello_test();
+      //       }
+      //       document.body.appendChild(script);
+      //     }
+      // };
     });
    
 </script>
